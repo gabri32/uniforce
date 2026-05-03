@@ -10,7 +10,7 @@ app.use(express.json());
 //apis
 import admin from './routes/park.routes.js'
 const PORT = process.env.PORT || 3000;
-
+app.use('/admin', admin);
 const startServer = async () => {
   try {
     await sequelize.authenticate();

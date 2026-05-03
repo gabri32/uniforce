@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Sequelize, DataTypes } from 'sequelize';
 import sequelize from '../db/database.js';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,11 +21,11 @@ const files = fs.readdirSync(__dirname)
   });
 
 for (const file of files) {
-  const { default: model } = await import(path.join(__dirname, file));
+  const modelPath = pathToFileURL(path.join(__dirname, file)).href;
+  const { default: model } = await import(modelPath);
   const modelInstance = model(sequelize, DataTypes);
   db[modelInstance.name] = modelInstance;
 }
-console.log(db)
 // Relaciones (si tienes asociaciones después)
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

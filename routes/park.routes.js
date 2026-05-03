@@ -1,4 +1,5 @@
-import * as managmentController from '../controllers/management.controller'
+import express from 'express';
+import * as managmentController from '../controllers/management.controller.js';
 const router = express.Router();
 
 router.post('/createMoto', async (req, res) => {
