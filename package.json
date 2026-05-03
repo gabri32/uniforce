@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "nodemon"
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"No tests configured\""
   },
   "author": "gabriel de la cruz",
   "license": "ISC",
@@ -13,6 +15,7 @@
     "axios": "^1.16.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "pg": "^8.20.0",
     "sequelize": "^6.37.8"
   }
 }
