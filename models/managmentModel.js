@@ -1,3 +1,5 @@
+import { all } from "axios";
+
 export default (sequelize, DataTypes) => {
   const Motos = sequelize.define('Motos', {
   id_moto: {
@@ -34,10 +36,21 @@ export default (sequelize, DataTypes) => {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  gabeta:{
+    type:DataTypes.INTEGER,
+    allowNull:true
+  },
+  cascos:{
+    type:DataTypes.INTEGER,
+    allowNull:false
+  }
 }, {
   schema: 'parqueadero',     
   tableName: 'motos',        
-  timestamps: false,         
+  timestamps: false,  
+    defaultScope: {
+      raw: true
+    }       
 });
 
   return Motos;
