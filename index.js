@@ -1,14 +1,19 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
+import cors  from 'cors';
 
 import express from 'express';
 import sequelize from './db/database.js';
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 //apis
+
+
 import admin from './routes/park.routes.js'
+
+
 const PORT = process.env.PORT || 3000;
 app.use('/admin', admin);
 const startServer = async () => {

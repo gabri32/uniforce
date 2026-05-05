@@ -44,11 +44,11 @@ const Registro = async (req) => {
 const registrar_salida = async (req) => {
     try {
 
-        const { id_moto } = req.body
-        if (!id_moto) {
+        const { placa } = req.body
+        if (!placa) {
             throw new Error("faltan valores de entrada")
         }
-        const moto = await db.Motos.findByPk(id_moto)
+        const moto = await db.Motos.findOne({where:{placa:placa}})
         // const motoValid = 
         const data = await db.Precio.findOne();
         const fecha_ini = moto.fecha_ingreso;
