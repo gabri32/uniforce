@@ -55,10 +55,19 @@ const registrar_salida = async (req) => {
         const fecha_salida = new Date();
         const valor_hora = data.precio;
         const valor_extra = 600;
-       
+
 
         const valor = await calculos.calcularValorHora({ fecha_ini, fecha_salida, valor_hora, valor_extra })
         return valor
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+const MotosActuales = async () => {
+    try {
+        const motos = await db.Motos.findAll({})
+        return motos
     } catch (error) {
         console.log(error)
         throw error
@@ -68,5 +77,6 @@ const registrar_salida = async (req) => {
 
 export {
     Registro,
-    registrar_salida
+    registrar_salida,
+    MotosActuales
 };
