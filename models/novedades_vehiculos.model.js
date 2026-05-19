@@ -39,6 +39,7 @@ export default (sequelize, DataTypes) => {
     },
     {
       tableName: 'novedades_vehiculos',
+      schema:'apoyo',
       timestamps: false,
     }
   );

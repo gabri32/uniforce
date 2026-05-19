@@ -32,7 +32,10 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER, // int4 NOT NULL
         allowNull: false,
         references: {
+
           model: 'tipo_motorizados',
+          schema:'apoyo',
+
           key: 'id_tipo_motorizado',
         },
       },

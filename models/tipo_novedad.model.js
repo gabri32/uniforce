@@ -15,6 +15,7 @@ export default (sequelize, DataTypes) => {
     },
     {
       tableName: 'tipo_novedad',
+      schema:'apoyo',
       timestamps: false,
     }
   );

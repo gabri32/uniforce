@@ -51,6 +51,7 @@ export default (sequelize, DataTypes) => {
     },
     {
       tableName: 'bienes_devolutivos',
+      schema:'financiero',
       timestamps: false,
     }
   );

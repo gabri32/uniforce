@@ -15,6 +15,7 @@ export default (sequelize, DataTypes) => {
     },
     {
       tableName: 'estados',
+      schema:'financiero',
       timestamps: false,
     }
   );
