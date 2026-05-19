@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import cors  from 'cors';
-
+import https from 'https';
 import express from 'express';
 import sequelize from './db/database.js';
 import { fileURLToPath } from 'url';
@@ -35,6 +35,14 @@ app.use('/api/tipo-motorizados', tipoMotorizadosRoutes);
 app.use('/api/vehiculos-motorizados', vehiculosMotorizadosRoutes);
 app.use('/api/tipo-novedad', tipoNovedadRoutes);
 app.use('/api/novedades-vehiculos', novedadesVehiculosRoutes);
+// Auto-ping cada 2 minutos (120000 ms)
+setInterval(() => {
+  https.get("https://uniforce.onrender.com", (res) => {
+    console.log(`Ping enviado, status code: ${res}`);
+  }).on("error", (err) => {
+    console.error("Error en auto-ping:", err.message);
+  });
+}, 720000);
 const startServer = async () => {
   try {
     await sequelize.authenticate();
