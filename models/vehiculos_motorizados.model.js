@@ -34,7 +34,6 @@ export default (sequelize, DataTypes) => {
         references: {
 
           model: 'tipo_motorizados',
-          schema:'apoyo',
 
           key: 'id_tipo_motorizado',
         },
@@ -46,6 +45,8 @@ export default (sequelize, DataTypes) => {
     },
     {
       tableName: 'vehiculos_motorizados',
+          schema:'apoyo',
+
       timestamps: false,
     }
   );

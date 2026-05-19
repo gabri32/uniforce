@@ -7,19 +7,12 @@ const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Guarda en /uploads/novedades relativo a la raíz del proyecto
     cb(null, path.join(__dirname, '..', 'uploads', 'novedades'));
   },
   filename: (req, file, cb) => {
-    // Nombre: novedad_<tipo_detalle>_<timestamp><ext>
-    // El tipo_detalle viene en req.body.tipo_detalle (lo inyecta el controlador antes de multer)
+    // Nombre temporal — el controlador lo renombra con el detalle del tipo
     const ext = path.extname(file.originalname);
-    const tipoDetalle = (req.body.tipo_detalle || 'archivo')
-      .toLowerCase()
-      .replace(/\s+/g, '_')       // espacios → guión bajo
-      .replace(/[^a-z0-9_]/g, ''); // caracteres especiales fuera
-    const nombre = `novedad_${tipoDetalle}_${Date.now()}${ext}`;
-    cb(null, nombre);
+    cb(null, `tmp_${Date.now()}${ext}`);
   },
 });
 

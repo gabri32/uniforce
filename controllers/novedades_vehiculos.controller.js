@@ -1,6 +1,11 @@
 import db from '../models/index.js';
 import { uploadNovedad } from '../helpers/upload.js';
-import { Op } from 'sequelize';
+import { rename } from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const { novedades_vehiculos, vehiculos_motorizados, tipo_novedad, bienes_devolutivos, tipo_motorizados } = db;
 
@@ -90,62 +95,100 @@ export const getById = async (req, res) => {
 
 // POST /novedades-vehiculos - Crea novedad y guarda el archivo con nombre descriptivo
 export const create = async (req, res) => {
-  // 1. Primero buscamos el tipo_novedad para tener su detalle antes de que multer nombre el archivo
-  const { id_tipo_novedad } = req.body;
+  // 1. Primero ejecutamos multer para que parsee el multipart/form-data
+  uploadNovedad(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
 
-  try {
-    // Obtenemos el detalle del tipo para usarlo en el nombre del archivo
-    const tipo = await tipo_novedad.findByPk(id_tipo_novedad, { attributes: ['detalle'] });
-    if (!tipo) return res.status(404).json({ message: 'Tipo de novedad no encontrado' });
+    try {
+      const { id_vehiculo, id_tipo_novedad, detalle, valor } = req.body;
 
-    // Inyectamos el detalle en req.body para que multer lo use al nombrar el archivo
-    req.body.tipo_detalle = tipo.detalle;
+      // 2. Ahora que multer parseó el body, buscamos el tipo de novedad
+      const tipo = await tipo_novedad.findByPk(id_tipo_novedad, { attributes: ['detalle'] });
+      if (!tipo) return res.status(404).json({ message: 'Tipo de novedad no encontrado' });
 
-    // 2. Ejecutamos multer manualmente
-    uploadNovedad(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({ message: err.message });
+      let url_archivo = null;
+
+      // 3. Si hay archivo, lo renombramos con el nombre descriptivo
+      if (req.file) {
+        const ext = path.extname(req.file.originalname);
+        const tipoDetalle = tipo.detalle
+          .toLowerCase()
+          .replace(/\s+/g, '_')
+          .replace(/[^a-z0-9_]/g, '');
+        const nuevoNombre = `novedad_${tipoDetalle}_${Date.now()}${ext}`;
+        const dirUploads = path.join(__dirname, '..', 'uploads', 'novedades');
+        await rename(
+          path.join(dirUploads, req.file.filename),
+          path.join(dirUploads, nuevoNombre)
+        );
+        url_archivo = nuevoNombre;
       }
 
-      try {
-        const { id_vehiculo, detalle, valor } = req.body;
+      // 4. Guardamos en BD
+      const data = await novedades_vehiculos.create({
+        id_vehiculo,
+        id_tipo_novedad,
+        detalle,
+        url_archivo,
+        valor: valor || null,
+      });
 
-        // 3. url_archivo guarda solo el nombre del archivo (el origen se concatena en el GET)
-        const url_archivo = req.file ? req.file.filename : null;
-
-        const data = await novedades_vehiculos.create({
-          id_vehiculo,
-          id_tipo_novedad,
-          detalle,
-          url_archivo,
-          valor,
-        });
-
-        res.status(201).json(data);
-      } catch (error) {
-        console.error('Error al guardar novedad:', error);
-        res.status(500).json({ message: 'Error interno del servidor', error: error.message });
-      }
-    });
-  } catch (error) {
-    console.error('Error en create novedades_vehiculos:', error);
-    res.status(500).json({ message: 'Error interno del servidor', error: error.message });
-  }
+      res.status(201).json(data);
+    } catch (error) {
+      console.error('Error al guardar novedad:', error);
+      res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+    }
+  });
 };
 
 // PUT /novedades-vehiculos/:id
 export const update = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { id_vehiculo, id_tipo_novedad, detalle, url_archivo, valor } = req.body;
-    const registro = await novedades_vehiculos.findByPk(id);
-    if (!registro) return res.status(404).json({ message: 'Novedad no encontrada' });
-    await registro.update({ id_vehiculo, id_tipo_novedad, detalle, url_archivo, valor });
-    res.status(200).json(registro);
-  } catch (error) {
-    console.error('Error en update novedades_vehiculos:', error);
-    res.status(500).json({ message: 'Error interno del servidor', error: error.message });
-  }
+  // Pasamos multer para parsear multipart/form-data si viene así
+  uploadNovedad(req, res, async (err) => {
+    if (err) return res.status(400).json({ message: err.message });
+
+    try {
+      const { id } = req.params;
+      const { id_vehiculo, id_tipo_novedad, detalle, valor } = req.body;
+
+      const registro = await novedades_vehiculos.findByPk(id);
+      if (!registro) return res.status(404).json({ message: 'Novedad no encontrada' });
+
+      let url_archivo = registro.url_archivo; // mantener el archivo actual por defecto
+
+      // Si viene un archivo nuevo, renombrarlo y reemplazar
+      if (req.file) {
+        const tipo = await tipo_novedad.findByPk(id_tipo_novedad || registro.id_tipo_novedad, { attributes: ['detalle'] });
+        const ext = path.extname(req.file.originalname);
+        const tipoDetalle = (tipo?.detalle || 'archivo')
+          .toLowerCase()
+          .replace(/\s+/g, '_')
+          .replace(/[^a-z0-9_]/g, '');
+        const nuevoNombre = `novedad_${tipoDetalle}_${Date.now()}${ext}`;
+        const dirUploads = path.join(__dirname, '..', 'uploads', 'novedades');
+        await rename(
+          path.join(dirUploads, req.file.filename),
+          path.join(dirUploads, nuevoNombre)
+        );
+        url_archivo = nuevoNombre;
+      }
+
+      await registro.update({
+        id_vehiculo:     id_vehiculo     ?? registro.id_vehiculo,
+        id_tipo_novedad: id_tipo_novedad ?? registro.id_tipo_novedad,
+        detalle:         detalle         ?? registro.detalle,
+        url_archivo,
+        valor:           valor           ?? registro.valor,
+      });
+
+      res.status(200).json(registro);
+    } catch (error) {
+      console.error('Error en update novedades_vehiculos:', error);
+      res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+    }
+  });
 };
 
 // DELETE /novedades-vehiculos/:id
