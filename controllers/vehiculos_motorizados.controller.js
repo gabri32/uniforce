@@ -24,7 +24,7 @@ export const getAll = async (req, res) => {
         {
           model: novedades_vehiculos,
           as: 'novedades',
-          attributes: ['id_novedad', 'detalle', 'valor', 'url_archivo'],
+          attributes: ['id_novedad', 'detalle', 'valor', 'valor_por_galon', 'kilometraje', 'centro_costos', 'comprobante', 'url_archivo'],
           include: [
             { model: tipo_novedad, as: 'tipo_novedad', attributes: ['id_tipo_novedad', 'detalle'] },
           ],
@@ -61,7 +61,7 @@ export const getById = async (req, res) => {
         {
           model: novedades_vehiculos,
           as: 'novedades',
-          attributes: ['id_novedad', 'detalle', 'valor', 'url_archivo'],
+          attributes: ['id_novedad', 'detalle', 'valor', 'valor_por_galon', 'kilometraje', 'centro_costos', 'comprobante', 'url_archivo'],
           include: [
             { model: tipo_novedad, as: 'tipo_novedad', attributes: ['id_tipo_novedad', 'detalle'] },
           ],
@@ -79,7 +79,11 @@ export const getById = async (req, res) => {
 // POST /vehiculos-motorizados
 export const create = async (req, res) => {
   try {
-    const { id_bien_dev, id_tipo_motorizado, placa, detalle, cilindraje, cantidad_pasajeros } = req.body;
+    const {
+      id_bien_dev, id_tipo_motorizado, placa, detalle, cilindraje, cantidad_pasajeros,
+      n_chasis, n_motor, fecha_inicio_tecnomecanica, fecha_fin_tecnomecanica,
+      fecha_ini_soat, fecha_fin_soat,
+    } = req.body;
     const data = await vehiculos_motorizados.create({
       id_bien_dev,
       id_tipo_motorizado,
@@ -87,6 +91,12 @@ export const create = async (req, res) => {
       detalle,
       cilindraje,
       cantidad_pasajeros,
+      n_chasis,
+      n_motor,
+      fecha_inicio_tecnomecanica,
+      fecha_fin_tecnomecanica,
+      fecha_ini_soat,
+      fecha_fin_soat,
     });
     res.status(201).json(data);
   } catch (error) {
@@ -99,10 +109,18 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { id_bien_dev, id_tipo_motorizado, placa, detalle, cilindraje, cantidad_pasajeros } = req.body;
+    const {
+      id_bien_dev, id_tipo_motorizado, placa, detalle, cilindraje, cantidad_pasajeros,
+      n_chasis, n_motor, fecha_inicio_tecnomecanica, fecha_fin_tecnomecanica,
+      fecha_ini_soat, fecha_fin_soat,
+    } = req.body;
     const registro = await vehiculos_motorizados.findByPk(id);
     if (!registro) return res.status(404).json({ message: 'Vehículo motorizado no encontrado' });
-    await registro.update({ id_bien_dev, id_tipo_motorizado, placa, detalle, cilindraje, cantidad_pasajeros });
+    await registro.update({
+      id_bien_dev, id_tipo_motorizado, placa, detalle, cilindraje, cantidad_pasajeros,
+      n_chasis, n_motor, fecha_inicio_tecnomecanica, fecha_fin_tecnomecanica,
+      fecha_ini_soat, fecha_fin_soat,
+    });
     res.status(200).json(registro);
   } catch (error) {
     console.error('Error en update vehiculos_motorizados:', error);

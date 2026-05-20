@@ -102,7 +102,7 @@ export const create = async (req, res) => {
     }
 
     try {
-      const { id_vehiculo, id_tipo_novedad, detalle, valor } = req.body;
+      const { id_vehiculo, id_tipo_novedad, detalle, valor, valor_por_galon, kilometraje, centro_costos, comprobante } = req.body;
 
       // 2. Ahora que multer parseó el body, buscamos el tipo de novedad
       const tipo = await tipo_novedad.findByPk(id_tipo_novedad, { attributes: ['detalle'] });
@@ -133,6 +133,10 @@ export const create = async (req, res) => {
         detalle,
         url_archivo,
         valor: valor || null,
+        valor_por_galon: valor_por_galon || null,
+        kilometraje: kilometraje || null,
+        centro_costos: centro_costos || null,
+        comprobante: comprobante || null,
       });
 
       res.status(201).json(data);
@@ -151,7 +155,7 @@ export const update = async (req, res) => {
 
     try {
       const { id } = req.params;
-      const { id_vehiculo, id_tipo_novedad, detalle, valor } = req.body;
+      const { id_vehiculo, id_tipo_novedad, detalle, valor, valor_por_galon, kilometraje, centro_costos, comprobante } = req.body;
 
       const registro = await novedades_vehiculos.findByPk(id);
       if (!registro) return res.status(404).json({ message: 'Novedad no encontrada' });
@@ -181,6 +185,10 @@ export const update = async (req, res) => {
         detalle:         detalle         ?? registro.detalle,
         url_archivo,
         valor:           valor           ?? registro.valor,
+        valor_por_galon: valor_por_galon ?? registro.valor_por_galon,
+        kilometraje:     kilometraje     ?? registro.kilometraje,
+        centro_costos:   centro_costos   ?? registro.centro_costos,
+        comprobante:     comprobante     ?? registro.comprobante,
       });
 
       res.status(200).json(registro);

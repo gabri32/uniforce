@@ -42,6 +42,30 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING, // varchar NOT NULL
         allowNull: false,
       },
+      n_chasis: {
+        type: DataTypes.STRING, // varchar (nullable)
+        allowNull: true,
+      },
+      n_motor: {
+        type: DataTypes.STRING, // varchar (nullable)
+        allowNull: true,
+      },
+      fecha_inicio_tecnomecanica: {
+        type: DataTypes.DATE, // varchar (nullable)
+        allowNull: true,
+      },
+      fecha_fin_tecnomecanica: {
+        type: DataTypes.DATE, // varchar (nullable)
+        allowNull: true,
+      },
+      fecha_ini_soat: {
+        type: DataTypes.DATE, // varchar (nullable)
+        allowNull: true,
+      },
+      fecha_fin_soat: {
+        type: DataTypes.DATE, // varchar (nullable)
+        allowNull: true,
+      },
     },
     {
       tableName: 'vehiculos_motorizados',

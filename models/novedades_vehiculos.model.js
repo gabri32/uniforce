@@ -35,6 +35,23 @@ export default (sequelize, DataTypes) => {
       valor: {
         type: DataTypes.INTEGER, // int4 (nullable)
         allowNull: true,
+        defaultValue: 0,
+      },
+      valor_por_galon: {
+        type: DataTypes.BIGINT, // int8 (nullable)
+        allowNull: true,
+      },
+      kilometraje: {
+        type: DataTypes.BIGINT, // int8 (nullable)
+        allowNull: true,
+      },
+      centro_costos: {
+        type: DataTypes.STRING, // varchar (nullable)
+        allowNull: true,
+      },
+      comprobante: {
+        type: DataTypes.STRING, // varchar (nullable)
+        allowNull: true,
       },
     },
     {
