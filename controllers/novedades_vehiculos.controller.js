@@ -1,7 +1,11 @@
 import db from '../models/index.js';
-import { uploadNovedad, UPLOADS_DIR } from '../helpers/upload.js';
+import { uploadNovedad } from '../helpers/upload.js';
 import { rename } from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const { novedades_vehiculos, vehiculos_motorizados, tipo_novedad, bienes_devolutivos, tipo_motorizados } = db;
 
@@ -114,9 +118,10 @@ export const create = async (req, res) => {
           .replace(/\s+/g, '_')
           .replace(/[^a-z0-9_]/g, '');
         const nuevoNombre = `novedad_${tipoDetalle}_${Date.now()}${ext}`;
+        const dirUploads = path.join(__dirname, '..', 'uploads', 'novedades');
         await rename(
-          path.join(UPLOADS_DIR, req.file.filename),
-          path.join(UPLOADS_DIR, nuevoNombre)
+          path.join(dirUploads, req.file.filename),
+          path.join(dirUploads, nuevoNombre)
         );
         url_archivo = nuevoNombre;
       }
@@ -166,9 +171,10 @@ export const update = async (req, res) => {
           .replace(/\s+/g, '_')
           .replace(/[^a-z0-9_]/g, '');
         const nuevoNombre = `novedad_${tipoDetalle}_${Date.now()}${ext}`;
+        const dirUploads = path.join(__dirname, '..', 'uploads', 'novedades');
         await rename(
-          path.join(UPLOADS_DIR, req.file.filename),
-          path.join(UPLOADS_DIR, nuevoNombre)
+          path.join(dirUploads, req.file.filename),
+          path.join(dirUploads, nuevoNombre)
         );
         url_archivo = nuevoNombre;
       }

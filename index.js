@@ -6,7 +6,6 @@ import express from 'express';
 import sequelize from './db/database.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { UPLOADS_DIR } from './helpers/upload.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,8 +14,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Servir archivos estáticos de uploads (local: ./uploads, Render: /var/data)
-app.use('/uploads/novedades', express.static(UPLOADS_DIR));
+// Servir archivos estáticos de uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 //apis
 import admin from './routes/park.routes.js';
 import estadosRoutes from './routes/estados.routes.js';
